@@ -66,5 +66,6 @@ Some items may sound harsh but I jotted them down as I found them. Please ignore
     -rw-r--r--  1 hdm  everyone  505 Jun  6 16:03 configurator.xml
     -rw-r--r--  1 hdm  everyone   31 Mar 15 13:16 version.xml
     ```
-
-Oh, what a PITA it was to launch a `.app` program on MacOS successfully. I had quite a few choice words for this.
+    I haven't checked on Linux/Windows yet, but I am expecting no less confusion :-)
+    * Launching Capsense was even more interesting
+    
