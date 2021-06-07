@@ -71,19 +71,19 @@ Some items may sound harsh but I jotted them down as I found them. Please ignore
      * ![image](https://user-images.githubusercontent.com/41269583/121026655-2f08f680-c75b-11eb-97db-d75d4b5655ad.png)
      * I am trying to see a consistency here and thus far, it eludes me.
      ```
-     HaneefMac-2020:Hello_World hdm$ ls -l /Applications/ModusToolbox/tools_2.3/bt-configurator/
-  total 40
-  -rwxr-xr-x  1 hdm  everyone  136 Mar 15 13:16 bt-configurator
-  -rwxr-xr-x  1 hdm  everyone  140 Mar 15 13:16 bt-configurator-cli
-  drwxr-xr-x  3 hdm  everyone   96 Apr 27 12:01 bt-configurator.app
-  -rwxr-xr-x  1 hdm  everyone  499 Mar 15 13:15 bt-configurator.png
-  -rw-r--r--  1 hdm  everyone  505 Jun  6 16:03 configurator.xml
-  -rw-r--r--  1 hdm  everyone   31 Mar 15 13:16 version.xml
-  HaneefMac-2020:Hello_World hdm$ /Applications/ModusToolbox/tools_2.3/bt-configurator/bt-configurator --help
-  Usage: /Applications/ModusToolbox/tools_2.3/bt-configurator/bt-configurator.app/Contents/MacOS/bt-configurator [options] [config_file]
-  Provides graphical configuration of Bluetooth peripheral
+    HaneefMac-2020:Hello_World hdm$ ls -l /Applications/ModusToolbox/tools_2.3/bt-configurator/
+    total 40
+    -rwxr-xr-x  1 hdm  everyone  136 Mar 15 13:16 bt-configurator
+    -rwxr-xr-x  1 hdm  everyone  140 Mar 15 13:16 bt-configurator-cli
+    drwxr-xr-x  3 hdm  everyone   96 Apr 27 12:01 bt-configurator.app
+    -rwxr-xr-x  1 hdm  everyone  499 Mar 15 13:15 bt-configurator.png
+    -rw-r--r--  1 hdm  everyone  505 Jun  6 16:03 configurator.xml
+    -rw-r--r--  1 hdm  everyone   31 Mar 15 13:16 version.xml
+    HaneefMac-2020:Hello_World hdm$ /Applications/ModusToolbox/tools_2.3/bt-configurator/bt-configurator --help
+    Usage: /Applications/ModusToolbox/tools_2.3/bt-configurator/bt-configurator.app/Contents/MacOS/bt-configurator [options] [config_file]
+    Provides graphical configuration of Bluetooth peripheral
 
-  Options:
+    Options:
     -h, --help                  Displays this help.
     -v, --version               Displays version information.
     -c, --config <config_file>  Path to the
@@ -94,13 +94,13 @@ Some items may sound harsh but I jotted them down as I found them. Please ignore
                                 configuration file parent directory.
     -d, --device <device>       The target device family
 
-  Arguments:
+    Arguments:
     [config_file]               Opens the configuration file provided.
-  HaneefMac-2020:Hello_World hdm$ /Applications/ModusToolbox/tools_2.3/library-manager/library-manager --help
-  Usage: /Applications/ModusToolbox/tools_2.3/library-manager/library-manager.app/Contents/MacOS/library-manager [options]
-  Library Manager 1.30.0.1860
+    HaneefMac-2020:Hello_World hdm$ /Applications/ModusToolbox/tools_2.3/library-manager/library-manager --help
+    Usage: /Applications/ModusToolbox/tools_2.3/library-manager/library-manager.app/Contents/MacOS/library-manager [options]
+    Library Manager 1.30.0.1860
 
-  Options:
+    Options:
     -h, --help                 Displays this help.
     -v, --version              Displays version information.
     -d, --target-dir <Dir>     Target directory (the parent directory of the
@@ -108,11 +108,11 @@ Some items may sound harsh but I jotted them down as I found them. Please ignore
     --cypress-tools <Dir>      Path to ModusToolbox tools (e.g.
                                UserHome/ModusToolbox/tools_1.0).
     --ide-project-name <Name>  Name of the project in the IDE.
-  HaneefMac-2020:Hello_World hdm$ /Applications/ModusToolbox/tools_2.3/capsense-configurator/capsense-configurator --help
-  Usage: /Applications/ModusToolbox/tools_2.3/capsense-configurator/capsense-configurator.app/Contents/MacOS/capsense-configurator [options] [config_file]
-  Provides graphical configuration of CapSense peripheral
+    HaneefMac-2020:Hello_World hdm$ /Applications/ModusToolbox/tools_2.3/capsense-configurator/capsense-configurator --help
+    Usage: /Applications/ModusToolbox/tools_2.3/capsense-configurator/capsense-configurator.app/Contents/MacOS/capsense-configurator [options] [config_file]
+    Provides graphical configuration of CapSense peripheral
 
-  Options:
+    Options:
     -h, --help                                 Displays this help.
     -v, --version                              Displays version information.
     -c, --config <config_file>                 Path to the
@@ -139,7 +139,7 @@ Some items may sound harsh but I jotted them down as I found them. Please ignore
                                                used in conjunction with
                                                --check-mcu
 
-  Arguments:
+    Arguments:
     [config_file]                              Opens the configuration file
                                                provided.
     ```
