@@ -57,15 +57,91 @@ Some items may sound harsh but I jotted them down as I found them. Please ignore
 
     * Location and naming of the executable(s). There are 3-4 versions of how to start the program. Which is the best way for each platform?
     ```
-    HaneefMac-2020:Hello_World hdm$ ls -l /Applications/ModusToolbox/tools_2.3/bt-configurator/
-    total 40
-    -rwxr-xr-x  1 hdm  everyone  136 Mar 15 13:16 bt-configurator
-    -rwxr-xr-x  1 hdm  everyone  140 Mar 15 13:16 bt-configurator-cli
-    drwxr-xr-x  3 hdm  everyone   96 Apr 27 12:01 bt-configurator.app
-    -rwxr-xr-x  1 hdm  everyone  499 Mar 15 13:15 bt-configurator.png
-    -rw-r--r--  1 hdm  everyone  505 Jun  6 16:03 configurator.xml
-    -rw-r--r--  1 hdm  everyone   31 Mar 15 13:16 version.xml
+     HaneefMac-2020:Hello_World hdm$ ls -l /Applications/ModusToolbox/tools_2.3/bt-configurator/
+     total 40
+     -rwxr-xr-x  1 hdm  everyone  136 Mar 15 13:16 bt-configurator
+     -rwxr-xr-x  1 hdm  everyone  140 Mar 15 13:16 bt-configurator-cli
+     drwxr-xr-x  3 hdm  everyone   96 Apr 27 12:01 bt-configurator.app
+     -rwxr-xr-x  1 hdm  everyone  499 Mar 15 13:15 bt-configurator.png
+     -rw-r--r--  1 hdm  everyone  505 Jun  6 16:03 configurator.xml
+     -rw-r--r--  1 hdm  everyone   31 Mar 15 13:16 version.xml
+     ```
+     I haven't checked on Linux/Windows yet, but I am expecting no less confusion :-)
+     * Launching Capsense was even more interesting
+     * ![image](https://user-images.githubusercontent.com/41269583/121026655-2f08f680-c75b-11eb-97db-d75d4b5655ad.png)
+     * I am trying to see a consistency here and thus far, it eludes me.
+     ```
+     HaneefMac-2020:Hello_World hdm$ ls -l /Applications/ModusToolbox/tools_2.3/bt-configurator/
+  total 40
+  -rwxr-xr-x  1 hdm  everyone  136 Mar 15 13:16 bt-configurator
+  -rwxr-xr-x  1 hdm  everyone  140 Mar 15 13:16 bt-configurator-cli
+  drwxr-xr-x  3 hdm  everyone   96 Apr 27 12:01 bt-configurator.app
+  -rwxr-xr-x  1 hdm  everyone  499 Mar 15 13:15 bt-configurator.png
+  -rw-r--r--  1 hdm  everyone  505 Jun  6 16:03 configurator.xml
+  -rw-r--r--  1 hdm  everyone   31 Mar 15 13:16 version.xml
+  HaneefMac-2020:Hello_World hdm$ /Applications/ModusToolbox/tools_2.3/bt-configurator/bt-configurator --help
+  Usage: /Applications/ModusToolbox/tools_2.3/bt-configurator/bt-configurator.app/Contents/MacOS/bt-configurator [options] [config_file]
+  Provides graphical configuration of Bluetooth peripheral
+
+  Options:
+    -h, --help                  Displays this help.
+    -v, --version               Displays version information.
+    -c, --config <config_file>  Path to the
+                                configuration file.
+    -o, --output-dir <dir>      The path to the
+                                generated source directory. It is either an
+                                absolute path or a path relative to the
+                                configuration file parent directory.
+    -d, --device <device>       The target device family
+
+  Arguments:
+    [config_file]               Opens the configuration file provided.
+  HaneefMac-2020:Hello_World hdm$ /Applications/ModusToolbox/tools_2.3/library-manager/library-manager --help
+  Usage: /Applications/ModusToolbox/tools_2.3/library-manager/library-manager.app/Contents/MacOS/library-manager [options]
+  Library Manager 1.30.0.1860
+
+  Options:
+    -h, --help                 Displays this help.
+    -v, --version              Displays version information.
+    -d, --target-dir <Dir>     Target directory (the parent directory of the
+                               project or projects).
+    --cypress-tools <Dir>      Path to ModusToolbox tools (e.g.
+                               UserHome/ModusToolbox/tools_1.0).
+    --ide-project-name <Name>  Name of the project in the IDE.
+  HaneefMac-2020:Hello_World hdm$ /Applications/ModusToolbox/tools_2.3/capsense-configurator/capsense-configurator --help
+  Usage: /Applications/ModusToolbox/tools_2.3/capsense-configurator/capsense-configurator.app/Contents/MacOS/capsense-configurator [options] [config_file]
+  Provides graphical configuration of CapSense peripheral
+
+  Options:
+    -h, --help                                 Displays this help.
+    -v, --version                              Displays version information.
+    -c, --config <config_file>                 Path to the
+                                               configuration file.
+    -o, --output-dir <dir>                     The path to the
+                                               generated source directory. It is
+                                               either an absolute path or a path
+                                               relative to the configuration file
+                                               parent directory.
+    -d, --design <design_file>                 Opens the *.modus
+                                               file provided.
+    -l, --library <library>                    Custom backend device support
+                                               library file (including file name).
+    -t, --tools <tools_directory>              Custom
+                                               backend content (tools) directory
+                                               location.
+    --check-mcu <check-mcu>                    Check MCU MPN against the contents
+                                               of the design file. Should be used
+                                               in conjunction with
+                                               --check-coprocessors
+    --check-coprocessors <check-coprocessors>  Check coprocessor MPNs against the
+                                               contents of the design file
+                                               [comma-separated list]. Should be
+                                               used in conjunction with
+                                               --check-mcu
+
+  Arguments:
+    [config_file]                              Opens the configuration file
+                                               provided.
     ```
-    I haven't checked on Linux/Windows yet, but I am expecting no less confusion :-)
-    * Launching Capsense was even more interesting
+
     
