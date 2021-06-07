@@ -378,6 +378,7 @@ export class MTBToolsProvider implements vscode.TreeDataProvider<MTBToolEntry> {
 
     // onDidChangeTreeData?: vscode.Event<void | MTBToolEntry | null | undefined> | undefined;
     protected toolsDict : { [path: string]: MTBToolEntry[] } = {};
+    protected isLoadingMsg : string | null = null;
     protected allTools : MTBToolEntry[] = [];
     constructor() {
         this.getWorkspaceTools();
@@ -386,16 +387,23 @@ export class MTBToolsProvider implements vscode.TreeDataProvider<MTBToolEntry> {
     private getWorkspaceTools() {
         this.toolsDict = {};
         this.allTools = [];
+        let firstFolder = true;
         for (const folder of (vscode.workspace.workspaceFolders || [])) {
             const fsPath = folder.uri.fsPath;
             const mtbStuff = path.join(fsPath, '.mtbLaunchConfigs');
             if (fs.existsSync(mtbStuff)) {
+                if (!this.isLoadingMsg && firstFolder) {
+                    this.isLoadingMsg = `Updating '${fsPath}'...`;
+                    this._onDidChangeTreeData.fire();
+                }
                 this.getToolsForPath(fsPath).then((tools) => {
                     if (tools) {
                         this.toolsDict[fsPath] = tools;
                         // We need to find a better way
-                        if (this.allTools.length === 0) {
+                        if (firstFolder && (tools.length !== 0)) {
                             this.allTools = tools;
+                            this.isLoadingMsg = null;
+                            firstFolder = false;
                             this._onDidChangeTreeData.fire();
                         }
                     }
@@ -412,9 +420,10 @@ export class MTBToolsProvider implements vscode.TreeDataProvider<MTBToolEntry> {
             return element.getChildren();
         }
         if (!this.allTools || (this.allTools.length === 0)) {
+            const msg = this.isLoadingMsg || 'Could not find tools list!!!. Wrong dir?';
             const raw = new RawTool(
                 // eslint-disable-next-line @typescript-eslint/naming-convention
-                '', '', '!missing!', {display_name: ["Could not find tools list!!!. Wrong dir?"]});
+                '', '', '!dummy!', {display_name: [msg]});
             const dummy = new MTBToolEntry(raw, '?');
             return [ dummy ];
         }
