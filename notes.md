@@ -63,7 +63,7 @@ Some items may sound harsh but I jotted them down as I found them. Please ignore
         Another issue is the config. file name. Where did that come from? Is there a convention that I could follow?
 
     * Location and naming of the executable(s). There are 3-4 versions of how to start the program. Which is the best way for each platform?
-        <span style="font-size:0.75em;">
+        <span style="font-size:0.5em;">
         ```
          HaneefMac-2020:Hello_World hdm$ ls -l /Applications/ModusToolbox/tools_2.3/bt-configurator/
          total 40
@@ -75,9 +75,13 @@ Some items may sound harsh but I jotted them down as I found them. Please ignore
          -rw-r--r--  1 hdm  everyone   31 Mar 15 13:16 version.xml
          ```
          </span>
+         
      I haven't checked on Linux/Windows yet, but I am expecting no less confusion :-)
      * Launching Capsense was even more interesting
-     * ![image](https://user-images.githubusercontent.com/41269583/121026655-2f08f680-c75b-11eb-97db-d75d4b5655ad.png)
+
+       <img src="https://user-images.githubusercontent.com/41269583/121026655-2f08f680-c75b-11eb-97db-d75d4b5655ad.png" width="50%" height="50%" />
+
+
      * I am trying to see a consistency here and thus far, it eludes me.
         <span style="font-size:0.75em;">
          ```
