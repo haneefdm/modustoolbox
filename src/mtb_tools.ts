@@ -222,7 +222,7 @@ class Junk {
                             display_name: [`Library Manager` + (version ? ' ' + version : '')],
                             executable: [ libMgr ],
                             // eslint-disable-next-line @typescript-eslint/naming-convention
-                            command_line_args: ['--config=$CONFIG_FILE'],
+                            // command_line_args: ['--config=$CONFIG_FILE'],
                             version: [ version || '' ]
                         };
                         configObjs.push(new RawTool(toolsDir, configFile, tool, conf));
@@ -349,10 +349,9 @@ export class MTBToolEntry extends BaseTreeNode {
     public execTool(): void {
         const osName = os.platform();
         const baseName = this.exeName();
-        const ext = (osName === 'darwin') ? '.app' : ((osName === 'linux') ? '' : '.exe');
-        let fullPath = path.join(this.obj.toolsDir, this.obj.id, baseName + ext);
+        let fullPath = path.join(this.obj.toolsDir, this.obj.id, baseName);
         const args = [];
-        if (osName === 'darwin') {
+        if (osName === 'linux') {
             args.push(`open -a "${fullPath}" --args`);
         } else {
             args.push(`"${fullPath}"`);
