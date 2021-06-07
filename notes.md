@@ -8,17 +8,17 @@ Some items may sound harsh but I jotted them down as I found them. Please ignore
   * Can't rely on 'make' being found -- on Windows especially. The command above produces the required info but that is a chicken and egg situation
   * Even if did find a make, that might not be the make we want. Will/can any `make` work?
 * Output of `make get_app_info`
-  * While this is normal text can **can** be parsed, it is not structured and likely to chance breaking all kinds of stuff
+  * While this is plain text, **can** be parsed, it is not structured and likely to break all kinds of stuff
   * How regimented is the output of this command?
   * Can the variable names change without notice?
   * Question is, can we rely on this?
 
 * More on `make get_app_info`
-  * There seem to be many sections and duplicate and sometimes conflicting information
+  * There seems to be many sections, duplicate and sometimes conflicting information
   * Section names are not machine friendly. Are these going to change?
   * For purposes of the IDE, which sections are interesting?
-  * Confusing/Conflicting info: Multiple versions of the truth
-    * `CONFIGURATOR_FILES`: This seems plural. What does it mean to have multiple .modus files for the same project? Or is this supposed to be config. files for all the configurators as well? What is it? What is it used for?
+  * Confusing/Conflicting info -- Multiple versions of the truth
+    * `CONFIGURATOR_FILES`: Plural? What does it mean to have multiple .modus files for the same project? Or is this supposed to be config. files for all the configurators as well? What is it? What is it used for?
     * `CY_TOOLS_PATH` and `CY_TOOLS_DIR`. Former is in the `IDE variables` section and the latter is in the `User: Path variables` section. Notice that the latter is ends with `_DIR` while it is in the `PATH` section while most other items in that section end with `_PATH`. See below.
         <span style="font-size:0.75em;">
         ```
@@ -40,7 +40,7 @@ Some items may sound harsh but I jotted them down as I found them. Please ignore
     * `SUPPORTED_TOOL_TYPES` vs `CY_SUPPORTED_TOOL_TYPES`. Former is in the `IDE variables` section and the latter is in the `User: Miscellaneous variables` section. I initially used the `IDE` section but I was wrong. The `Misc` section has the full list.
 * Configuration files
     * Why is the `Library Manager` special? Yes, it is not a configurator but it needed to be handled specially (aka hardcoded)
-    * No schema for configurator.xml files, so I am assuming this is regimented some other way. Thats okay. Do we have a doc that says what **can** appear here. Despite the file name, I noticed that you can have multiple configurators based on `XML` and coded as such. I found that Capsense indeed has more than one. So, I lucked out
+    * No schema for configurator.xml files, so I am assuming this is regimented some other way. Thats okay. Do we have a doc that says what **can** appear here. Despite the file name, I noticed that you can have multiple configurators based on `XML` I saw and coded as such. I found that Capsense indeed has more than one. So, I lucked out
     * The XML content is trouble some
       * `<display_name>` has version embedded in it. So ignore the `version.xml` file? What is the `version.xml` for can can it represent multiple configurators? Why not put `version` in the `configurator.xml` file itself?
       * `<icon>` While it could have been useful, it ends up being useless as they are visually imperciptable from each other, taking up space.
