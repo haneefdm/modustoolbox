@@ -45,7 +45,7 @@ Some items may sound harsh but I jotted them down as I found them. Please ignore
       * `<display_name>` has version embedded in it. So ignore the `version.xml` file? What is the `version.xml` for can can it represent multiple configurators? Why not put `version` in the `configurator.xml` file itself?
       * `<icon>` While it could have been useful, it ends up being useless as they are visually imperciptable from each other, taking up space.
       * `<new_configuration_enabled>`. What is this, and why? Like `New Coke`?
-      * `<command_line_args>` I got excited by this but it lasted just a few moments. This does not tell me how to launch a configurator does it? All (most) of them look like this
+      * **Not Used?** `<command_line_args>` I got excited by this but it lasted just a few moments. This does not tell me how to launch a configurator does it? All (most) of them look like this
           <span style="font-size:0.75em;">
           ```
           <command_line_args>--config=$CONFIG_FILE</command_line_args>
@@ -62,8 +62,8 @@ Some items may sound harsh but I jotted them down as I found them. Please ignore
 
         Another issue is the config. file name. Where did that come from? Is there a convention that I could follow?
 
-    * Location and naming of the executable(s). There are 3-4 versions of how to start the program. Which is the best way for each platform?
-        <span style="font-size:0.5em;">
+    * Answered looking at Eclispe source ~~Location and naming of the executable(s). There are 3-4 versions of how to start the program. Which is the best way for each platform?
+        <span style="font-size:0.5em;">~~
         ```
          HaneefMac-2020:Hello_World hdm$ ls -l /Applications/ModusToolbox/tools_2.3/bt-configurator/
          total 40
@@ -75,14 +75,14 @@ Some items may sound harsh but I jotted them down as I found them. Please ignore
          -rw-r--r--  1 hdm  everyone   31 Mar 15 13:16 version.xml
          ```
          </span>
-         
-     I haven't checked on Linux/Windows yet, but I am expecting no less confusion :-)
-     * Launching Capsense was even more interesting
+
+     ~~I haven't checked on Linux/Windows yet, but I am expecting no less confusion :-)~~
+     * Answered looking at Eclispe source ~~Launching Capsense was even more interesting~~
 
        <img src="https://user-images.githubusercontent.com/41269583/121026655-2f08f680-c75b-11eb-97db-d75d4b5655ad.png" width="50%" height="50%" />
 
 
-     * I am trying to see a consistency here and thus far, it eludes me.
+     * Answered looking at Eclispe source ~~I am trying to see a consistency here and thus far, it eludes me.~~
         <span style="font-size:0.75em;">
          ```
         HaneefMac-2020:Hello_World hdm$ ls -l /Applications/ModusToolbox/tools_2.3/bt-configurator/

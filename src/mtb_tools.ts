@@ -347,23 +347,8 @@ export class MTBToolEntry extends BaseTreeNode {
     }
 
     public execTool(): void {
-        const osName = os.platform();
-        const baseName = this.exeName();
-        let fullPath = path.join(this.obj.toolsDir, this.obj.id, baseName);
-        const args = [];
-        if (osName === 'linux') {
-            args.push(`open -a "${fullPath}" --args`);
-        } else {
-            args.push(`"${fullPath}"`);
-        }
-
-        const confFile = path.join(this.fsPath, this.obj.configFile);
-        for (const arg of this.cmdLineArgs()) {
-            args.push('"' + arg.replace(/\$CONFIG_FILE/g, confFile) + '"');
-        }
-        const cmd = args.join(' ');
-        console.log(cmd);
-        childProcess.exec(cmd, {cwd: this.fsPath /*detached: true*/}, (error) => {
+        const cmd = `make open "CY_OPEN_TYPE=${this.obj.id}"`;
+        childProcess.exec(cmd, {cwd: this.fsPath}, (error) => {
             if (error) {
                 console.log(error.message);
                 vscode.window.showErrorMessage(error.message);
