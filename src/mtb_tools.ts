@@ -452,14 +452,18 @@ export class MTBToolsProvider implements vscode.TreeDataProvider<MTBToolEntry> {
             });
         });
     }
+    public refresh() {
+
+    }
 }
 
 export class MTBTools {
 	constructor(context: vscode.ExtensionContext) {
-		const treeDataProvider = new MTBToolsProvider();
-		context.subscriptions.push(vscode.window.createTreeView('mtbTools', { treeDataProvider }));
+        const treeDataProvider = new MTBToolsProvider();
+        context.subscriptions.push(vscode.window.createTreeView('mtbTools', { treeDataProvider }));
 		vscode.commands.registerCommand('mtbTools.openTool', (tool) => this.openResource(tool));
-	}
+        vscode.commands.registerCommand('mtbTools.refresh', () => treeDataProvider.refresh());
+    }
 
 	private openResource(tool: MTBToolEntry): void {
 		vscode.window.showInformationMessage(`Clicked on ${tool.displayName()}!`);

@@ -29,10 +29,20 @@
 			{
 				"command": "mtbTools.openTool",
 				"title": "Open Modus Tool"
+			},
+			{
+				"command": "mtbTools.refresh",
+				"title": "Refresh",
+				"icon": "`${refresh}`"
 			}
 		],
 		"menus": {
 			"view/item/context": [
+				{
+					"command": "mtbTools.refreshEntry",
+					"when": "view == mtbTools",
+					"group": "navigation"
+				},
 				{
 					"command": "mtbTools.openTool",
 					"when": "view == mtbTools && viewItem == tool",
