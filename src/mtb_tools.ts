@@ -4,7 +4,6 @@ import * as os from 'os';
 import * as path from 'path';
 import * as xml2js from 'xml2js';
 import * as vscode from 'vscode';
-import { sign } from 'crypto';
 
 enum StateType {
     start = 0,
@@ -109,6 +108,7 @@ class RawTool {
 };
 
 class Junk {
+    public static readonly libraryManager: string  = 'library-manager';
     public static getProperties(fsPath: string): Promise<SectionNodes | null> {
         return new Promise((resolve, reject) => {
             try {
@@ -187,8 +187,7 @@ class Junk {
                 }
                 if (!toolsDir) { return resolve([]); }
 
-                const libMgr = 'library-manager';
-                const allConfigs = [libMgr];
+                const allConfigs = [Junk.libraryManager];
                 Junk.getToolsList(sections, allConfigs);
 
                 const configObjs: RawTool[] = [];
@@ -213,14 +212,14 @@ class Junk {
                             });
                         } catch (e) {
                         }
-                    } else if (tool === libMgr) {
+                    } else if (tool === Junk.libraryManager) {
                         // Fake an object
                         const v = version ? version : '';          
                         const conf = {
-                            '$': { id: libMgr },
+                            '$': { id: Junk.libraryManager},
                             // eslint-disable-next-line @typescript-eslint/naming-convention
                             display_name: [`Library Manager` + (version ? ' ' + version : '')],
-                            executable: [ libMgr ],
+                            executable: [ Junk.libraryManager],
                             // eslint-disable-next-line @typescript-eslint/naming-convention
                             // command_line_args: ['--config=$CONFIG_FILE'],
                             version: [ version || '' ]
@@ -347,13 +346,17 @@ export class MTBToolEntry extends BaseTreeNode {
     }
 
     public execTool(): void {
-        const cmd = `make open "CY_OPEN_TYPE=${this.obj.id}"`;
-        childProcess.exec(cmd, {cwd: this.fsPath}, (error) => {
-            if (error) {
-                console.log(error.message);
-                vscode.window.showErrorMessage(error.message);
-            }
-        });
+        let id = this.obj.id;
+        if (id) {
+            const target = (id === Junk.libraryManager) ? 'modlibs' : 'open';
+            const cmd = `make ${target} "CY_OPEN_TYPE=${id}"`;
+            childProcess.exec(cmd, {cwd: this.fsPath}, (error) => {
+                if (error) {
+                    console.log(error.message);
+                    vscode.window.showErrorMessage(error.message);
+                }
+            });
+        }
     }
 }
 
@@ -363,56 +366,74 @@ export class MTBToolsProvider implements vscode.TreeDataProvider<MTBToolEntry> {
 
     // onDidChangeTreeData?: vscode.Event<void | MTBToolEntry | null | undefined> | undefined;
     protected toolsDict : { [path: string]: MTBToolEntry[] } = {};
-    protected isLoadingMsg : string | null = null;
     protected allTools : MTBToolEntry[] = [];
+    protected updatingFolders : MTBToolEntry[] = [];
     constructor() {
         this.getWorkspaceTools();
     }
 
+    /**
+     * For those un-iniitated in Node.js and asynchronous programming, a word of caution.
+     * We launch make for all the workspace folders (generally just one interesting one)
+     * and they produce output on their own time. At the same time, we are keeping track
+     * of what is currently running and refreshing the GUI
+     */
     private getWorkspaceTools() {
         this.toolsDict = {};
         this.allTools = [];
-        let firstFolder = true;
         for (const folder of (vscode.workspace.workspaceFolders || [])) {
-            const fsPath = folder.uri.fsPath;
+            const fsPath: string = folder.uri.fsPath;
+            if (!fsPath) { continue; }
+
             const mtbStuff = path.join(fsPath, '.mtbLaunchConfigs');
             if (fs.existsSync(mtbStuff)) {
-                if (!this.isLoadingMsg && firstFolder) {
-                    this.isLoadingMsg = `Updating '${fsPath}'...`;
-                    this._onDidChangeTreeData.fire();
-                }
+                const msg = `Updating ${path.basename(fsPath)} ...`;
+                this.updatingFolders.push(MTBToolsProvider.createDummyNode(msg));
+                this._onDidChangeTreeData.fire();
                 this.getToolsForPath(fsPath).then((tools) => {
-                    if (tools) {
+                    if (tools && (tools.length !== 0)) {
                         this.toolsDict[fsPath] = tools;
-                        // We need to find a better way
-                        if (firstFolder && (tools.length !== 0)) {
+                        if (this.allTools.length === 0) {
                             this.allTools = tools;
-                            this.isLoadingMsg = null;
-                            firstFolder = false;
-                            this._onDidChangeTreeData.fire();
                         }
                     }
+                }).finally(() => {
+                    // Things can be deleted out of order. Delete the right one!
+                    const ix = this.updatingFolders.findIndex((item) => {
+                        return item.displayName() === msg;
+                    });
+                    this.updatingFolders.splice(ix, 1);
+                    this._onDidChangeTreeData.fire();
                 });
             }
         }
+        this._onDidChangeTreeData.fire();
     }
 
     getTreeItem(element: MTBToolEntry): vscode.TreeItem | Thenable<vscode.TreeItem> {
         return element.getTreeItem();
     }
+
     getChildren(element?: MTBToolEntry): vscode.ProviderResult<MTBToolEntry[]> {
         if (element) {
             return element.getChildren();
         }
-        if (!this.allTools || (this.allTools.length === 0)) {
-            const msg = this.isLoadingMsg || 'Could not find tools list!!!. Wrong dir?';
-            const raw = new RawTool(
-                // eslint-disable-next-line @typescript-eslint/naming-convention
-                '', '', '!dummy!', {display_name: [msg]});
-            const dummy = new MTBToolEntry(raw, '?');
+        if (this.updatingFolders.length !== 0) {
+            return this.updatingFolders;
+        } else if (this.allTools.length !== 0) {
+            return this.allTools;
+        } else {
+            const dummy = MTBToolsProvider.createDummyNode('Could not find tools list!!!. Wrong dir?');
             return [ dummy ];
         }
-        return this.allTools;
+    }
+
+    private static createDummyNode(msg: string) {
+        const raw = new RawTool(
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            '', '', '', { display_name: [msg] });
+        const dummy = new MTBToolEntry(raw, '?');
+        return dummy;
     }
 
     public getToolsForPath(fsPath: string): Promise<MTBToolEntry[] | null> {
