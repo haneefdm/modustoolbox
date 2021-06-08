@@ -30,7 +30,11 @@ export class MTBDocEntry extends BaseTreeNode {
 
     public openDoc() {
         if (this.uri) {
-
+            try {
+                vscode.env.openExternal(this.uri);
+            } catch {
+                vscode.window.showErrorMessage(`Could not open ${this.uri.toString(true)}`);
+            }
         }
     }
 }
