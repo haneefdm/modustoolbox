@@ -453,7 +453,7 @@ export class MTBToolsProvider implements vscode.TreeDataProvider<MTBToolEntry> {
         });
     }
     public refresh() {
-
+		this.getWorkspaceTools();
     }
 }
 

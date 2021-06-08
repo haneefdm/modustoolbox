@@ -28,21 +28,23 @@
 		"commands": [
 			{
 				"command": "mtbTools.openTool",
-				"title": "Open Modus Tool"
+				"title": "Open"
 			},
 			{
 				"command": "mtbTools.refresh",
 				"title": "Refresh",
-				"icon": "`${refresh}`"
+				"icon": "$(refresh)"
 			}
 		],
 		"menus": {
-			"view/item/context": [
+			"view/title": [
 				{
-					"command": "mtbTools.refreshEntry",
+					"command": "mtbTools.refresh",
 					"when": "view == mtbTools",
 					"group": "navigation"
-				},
+				}
+			],
+			"view/item/context": [
 				{
 					"command": "mtbTools.openTool",
 					"when": "view == mtbTools && viewItem == tool",
