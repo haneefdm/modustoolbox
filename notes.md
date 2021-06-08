@@ -4,6 +4,8 @@ Thoughts & Issues that need clarification
 
 Some items may sound harsh but I jotted them down as I found them. Please ignore the tone.
 
+* I am using the .mtbLaunchConfigs to trigger a `make get_app_info`. Is there a better way?
+
 * Step 1: was to run `make get_app_info`
   * Can't rely on 'make' being found -- on Windows especially. The command above produces the required info but that is a chicken and egg situation
   * Even if did find a make, that might not be the make we want. Will/can any `make` work?

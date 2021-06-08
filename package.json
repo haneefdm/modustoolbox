@@ -12,7 +12,8 @@
 	"activationEvents": [
 		"onCommand:modustoolbox.helloWorld",
 		"workspaceContains:./.mtbLaunchConfigs",
-		"onView:mtbToolsx"
+		"onView:mtbTools",
+		"onView:mtbDocs"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
@@ -21,6 +22,11 @@
 				{
 					"id": "mtbTools",
 					"name": "MTB Tools",
+					"visibility": "hidden"
+				},
+				{
+					"id": "mtbDocs",
+					"name": "MTB Docs",
 					"visibility": "hidden"
 				}
 			]
@@ -34,6 +40,15 @@
 				"command": "mtbTools.refresh",
 				"title": "Refresh",
 				"icon": "$(refresh)"
+			},
+			{
+				"command": "mtbDocs.openDoc",
+				"title": "Open"
+			},
+			{
+				"command": "mtbDocs.refresh",
+				"title": "Refresh",
+				"icon": "$(refresh)"
 			}
 		],
 		"menus": {
@@ -42,12 +57,22 @@
 					"command": "mtbTools.refresh",
 					"when": "view == mtbTools",
 					"group": "navigation"
+				},
+				{
+					"command": "mtbDocs.refresh",
+					"when": "view == mtbDocs",
+					"group": "navigation"
 				}
 			],
 			"view/item/context": [
 				{
 					"command": "mtbTools.openTool",
 					"when": "view == mtbTools && viewItem == tool",
+					"group": "inline"
+				},
+				{
+					"command": "mtbDocs.openDoc",
+					"when": "view == mtbDocs && viewItem == doc",
 					"group": "inline"
 				}
 			]

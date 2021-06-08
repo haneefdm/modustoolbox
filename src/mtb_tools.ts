@@ -1,9 +1,9 @@
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
-import * as os from 'os';
 import * as path from 'path';
 import * as xml2js from 'xml2js';
 import * as vscode from 'vscode';
+import { BaseTreeNode } from './base_tree_node';
 
 enum StateType {
     start = 0,
@@ -272,25 +272,6 @@ class Junk {
     }
 }
 
-abstract class BaseTreeNode {
-    protected expanded: boolean;
-    
-    constructor(protected readonly parent?: BaseTreeNode) {
-        this.expanded = false;
-    }
-
-    public getParent(): BaseTreeNode | undefined {
-        return this.parent;
-    }
-
-    public abstract getChildren(): BaseTreeNode[] | Promise<BaseTreeNode[]>;
-    public abstract getTreeItem(): vscode.TreeItem | Promise<vscode.TreeItem>;
-    
-    public getCommand(): vscode.Command | undefined {
-        return undefined;
-    }
-}
-
 export class MTBToolEntry extends BaseTreeNode {
     static displayNameProp = 'display_name';
     static exeNameProp = 'executable';
@@ -333,9 +314,8 @@ export class MTBToolEntry extends BaseTreeNode {
 
     public getTreeItem(): vscode.TreeItem | Promise<vscode.TreeItem> {
         const item = new vscode.TreeItem(this.displayName(), vscode.TreeItemCollapsibleState.None);
-        const nm = this.displayName();
-        if (nm !== '?') {
-			item.command = { command: 'mtbTools.openTool', title: `Open ${nm}`, arguments: [this], };
+        if (this.obj.id !== '') {
+			item.command = { command: 'mtbTools.openTool', title: `Open ${this.displayName}`, arguments: [this], };
 			item.contextValue = 'tool';
         }
         return item;
@@ -432,7 +412,7 @@ export class MTBToolsProvider implements vscode.TreeDataProvider<MTBToolEntry> {
         const raw = new RawTool(
             // eslint-disable-next-line @typescript-eslint/naming-convention
             '', '', '', { display_name: [msg] });
-        const dummy = new MTBToolEntry(raw, '?');
+        const dummy = new MTBToolEntry(raw, '');
         return dummy;
     }
 
@@ -463,6 +443,14 @@ export class MTBTools {
         context.subscriptions.push(vscode.window.createTreeView('mtbTools', { treeDataProvider }));
 		vscode.commands.registerCommand('mtbTools.openTool', (tool) => this.openResource(tool));
         vscode.commands.registerCommand('mtbTools.refresh', () => treeDataProvider.refresh());
+        vscode.workspace.onDidChangeWorkspaceFolders(e => {
+            // We could be smart and act on what changed (added or removed). Let us brute force for now
+            treeDataProvider.refresh();
+            // for (const added of e.added) {
+            //   const config = vscode.workspace.getConfiguration('tasks', e.added);
+            //   console.log(config);
+            // }
+          });
     }
 
 	private openResource(tool: MTBToolEntry): void {
