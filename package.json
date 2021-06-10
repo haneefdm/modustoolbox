@@ -10,13 +10,25 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:modustoolbox.helloWorld",
 		"workspaceContains:./.mtbLaunchConfigs",
-		"onView:mtbTools",
-		"onView:mtbDocs"
+		"onView:mtbToolsX",
+		"onView:mtbDocsX"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
+		"configuration": {
+			"type": "object",
+			"title": "modustoolbox Configuration",
+			"properties": {
+				"modustoolbox.toolsPath": {
+					"type": [
+						"string"
+					],
+					"default": "",
+					"description": "Full path to the ModusToolbox tools"
+				}
+			}
+		},
 		"views": {
 			"explorer": [
 				{
@@ -105,5 +117,8 @@
 		"vscode-test": "^1.5.2",
 		"webpack": "^5.38.1",
 		"webpack-cli": "^4.7.0"
+	},
+	"dependencies": {
+		"command-exists": "^1.2.9"
 	}
 }

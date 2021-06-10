@@ -99,13 +99,8 @@ export class MTBDocs {
 		vscode.commands.registerCommand('mtbDocs.openDoc', (doc) => this.openResource(doc));
         vscode.commands.registerCommand('mtbDocs.refresh', () => treeDataProvider.refresh());
         vscode.workspace.onDidChangeWorkspaceFolders(e => {
-            // We could be smart and act on what changed (added or removed). Let us brute force for now
             treeDataProvider.refresh();
-            // for (const added of e.added) {
-            //   const config = vscode.workspace.getConfiguration('tasks', e.added);
-            //   console.log(config);
-            // }
-          });
+        });
     }
 
 	private openResource(doc: MTBDocEntry): void {
