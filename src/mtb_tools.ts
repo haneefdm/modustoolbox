@@ -4,7 +4,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as xml2js from 'xml2js';
 import * as vscode from 'vscode';
-import { BaseTreeNode } from './base_tree_node';
+import {BaseTreeNode} from './base_tree_node';
+import {ModusToolboxExtension} from './extension';
 
 enum StateType {
     start = 0,
@@ -140,11 +141,13 @@ class Configurator {
     static newConfigEnabledProp = 'new_configuration_enabled';
     static supportedxtensionsProp = 'supported_file_extensions';
     static supportedxtensionProp = 'supported_file_extension';
+    static iconFileProp = 'icon';
 
     public displayName: string;
     public needsConfigFile;
     public extensions: string[] = [];
     public defaultExt: string = '';
+    public iconFile = '';
 
     constructor (
         public readonly toolsDir: string,
@@ -153,6 +156,11 @@ class Configurator {
     {
         this.displayName = XMLNodeHelpers.getElementStr(data, Configurator.displayNameProp) || '?huh?';
         this.needsConfigFile = XMLNodeHelpers.getElementStr(data, Configurator.newConfigEnabledProp).toLocaleLowerCase() === 'true';
+
+        this.iconFile = XMLNodeHelpers.getElementStr(data, Configurator.iconFileProp);
+        if (this.iconFile !== '') {
+            this.iconFile = path.join(toolsDir, id, this.iconFile);
+        }
 
         const exts = XMLNodeHelpers.getElementArray(data, Configurator.supportedxtensionsProp);
         for (const elt of exts) {
@@ -177,7 +185,8 @@ class MTBAppInfoParser {
     public static getProperties(fsPath: string): Promise<SectionNodes | null> {
         return new Promise((resolve, reject) => {
             try {
-                childProcess.exec('make get_app_info', {cwd: fsPath}, (err, stdout, stderr) => {
+                const make = ModusToolboxExtension.makeProgram;
+                childProcess.exec(`"${make}" get_app_info`, {cwd: fsPath}, (err, stdout, stderr) => {
                     if (err) {
                         console.log(err);
                         vscode.window.showErrorMessage(err.message);
@@ -243,8 +252,8 @@ class MTBAppInfoParser {
                 }
 
                 // NB: This seems pural. How does this work?
-                const configFile = sections.matchSectionVar('', /.+\/CONFIGURATOR_FILES$/);
-                if (!configFile) { return resolve([]); }
+                // const configFile = sections.matchSectionVar('', /.+\/CONFIGURATOR_FILES$/);
+                // if (!configFile) { return resolve([]); }
 
                 let toolsDir = sections.matchSectionVar('', /.+\/CY_TOOLS_DIR$/);
                 if (!toolsDir) {
@@ -382,6 +391,7 @@ export class MTBToolEntry extends BaseTreeNode {
         if (this.obj.id !== '') {
 			item.command = { command: 'mtbTools.openTool', title: `Open ${this.displayName}`, arguments: [this], };
 			item.contextValue = 'tool';
+            // item.iconPath = this.obj.iconFile;
         }
         return item;
     }
@@ -391,6 +401,7 @@ export class MTBToolEntry extends BaseTreeNode {
     }
 
     private execToolWithCmd(cmd:string) {
+        console.log(`Running: ${cmd}`);
         childProcess.exec(cmd, {cwd: this.fsPath}, (error) => {
             if (error) {
                 console.log(error.message);
@@ -403,11 +414,12 @@ export class MTBToolEntry extends BaseTreeNode {
         let id = this.obj.id;
         if (id === '') { return; }
 
+        const make = ModusToolboxExtension.makeProgram;
         const extensions = this.obj.extensions;
         if (id === MTBAppInfoParser.libraryManager) {
-            this.execToolWithCmd('make modlibs');
+            this.execToolWithCmd(`"${make}" modlibs`);
         } else if (true || !extensions || (extensions.length === 0)) {
-            this.execToolWithCmd(`make open "CY_OPEN_TYPE=${id}"`);
+            this.execToolWithCmd(`"${make}" open "CY_OPEN_TYPE=${id}"`);
         } else {
             const fsPath = (os.platform() === 'win32') ? this.fsPath.replace(/\\/g,'/') : this.fsPath;
             const exts = (extensions.length === 1) ? extensions[0] : `{${extensions.join(',')}}`;
@@ -423,15 +435,15 @@ export class MTBToolEntry extends BaseTreeNode {
                             title: 'Multiple configurator files found. Please select one'
                         };
                         vscode.window.showQuickPick(all, options).then((path) => {
-                            this.execToolWithCmd(`make open "CY_OPEN_TYPE=${id}" "CY_OPEN_FILE=${path}"`);
+                            this.execToolWithCmd(`"${make}" open "CY_OPEN_TYPE=${id}" "CY_OPEN_FILE=${path}"`);
                         });
                     } else {
-                        this.execToolWithCmd(`make open "CY_OPEN_TYPE=${id}" "CY_OPEN_FILE=${uris[0].fsPath}"`);
+                        this.execToolWithCmd(`"${make}" open "CY_OPEN_TYPE=${id}" "CY_OPEN_FILE=${uris[0].fsPath}"`);
                     }
                     // for (const uri of uris) {
                     //     console.log(uri.fsPath);
                     //     if (uri.fsPath.startsWith(fsPath)) {
-                    //         this.execToolWithCmd(`make open "CY_OPEN_TYPE=${id}" "CY_OPEN_FILE=${uri.fsPath}"`);
+                    //         this.execToolWithCmd(`"${make}" open "CY_OPEN_TYPE=${id}" "CY_OPEN_FILE=${uri.fsPath}"`);
                     //         return;
                     //     }
                     // }
