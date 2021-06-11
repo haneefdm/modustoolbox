@@ -359,7 +359,7 @@ export class MTBToolEntry extends BaseTreeNode {
     constructor(
         protected obj: Configurator | null,
         public readonly uri: vscode.Uri | null,
-        protected parent?: BaseTreeNode) {
+        parent?: BaseTreeNode) {
         super(parent);
         this.fsPath = uri?.fsPath || '';
     }
