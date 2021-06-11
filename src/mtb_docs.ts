@@ -34,6 +34,7 @@ export class MTBDocEntry extends BaseTreeNode {
 
     public addChild(child: MTBDocEntry): void {
         this.children.push(child);
+        child.parent = this;
     }
 
     public openDoc(): void {

@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 export abstract class BaseTreeNode {
     protected expanded: boolean;
 
-    constructor(protected readonly parent?: BaseTreeNode) {
+    constructor(protected parent?: BaseTreeNode) {
         this.expanded = false;
     }
 

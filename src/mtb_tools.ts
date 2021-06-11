@@ -181,7 +181,8 @@ class Configurator {
 };
 
 class MTBAppInfoParser {
-    public static readonly libraryManager: string  = 'library-manager';
+    public static readonly libMgrId: string  = 'library-manager';
+    public static libMgrObj : Configurator | null;
     public static getProperties(fsPath: string): Promise<SectionNodes | null> {
         return new Promise((resolve, reject) => {
             try {
@@ -261,7 +262,7 @@ class MTBAppInfoParser {
                 }
                 if (!toolsDir) { return resolve([]); }
 
-                const allConfigs = [MTBAppInfoParser.libraryManager];
+                const allConfigs = [MTBAppInfoParser.libMgrId];
                 MTBAppInfoParser.getToolsList(sections, allConfigs);
 
                 const configObjs: Configurator[] = [];
@@ -286,19 +287,20 @@ class MTBAppInfoParser {
                             });
                         } catch (e) {
                         }
-                    } else if (tool === MTBAppInfoParser.libraryManager) {
+                    } else if (!MTBAppInfoParser.libMgrObj && (tool === MTBAppInfoParser.libMgrId)) {
                         // Fake an object
                         const v = version ? version : '';          
                         const conf = {
-                            '$': { id: MTBAppInfoParser.libraryManager},
+                            '$': { id: MTBAppInfoParser.libMgrId},
                             // eslint-disable-next-line @typescript-eslint/naming-convention
                             display_name: [`Library Manager` + (version ? ' ' + version : '')],
-                            executable: [ MTBAppInfoParser.libraryManager],
+                            executable: [ MTBAppInfoParser.libMgrId],
                             // eslint-disable-next-line @typescript-eslint/naming-convention
                             // command_line_args: ['--config=$CONFIG_FILE'],
                             version: [ version || '' ]
                         };
-                        configObjs.push(new Configurator(toolsDir, tool, conf));
+                        MTBAppInfoParser.libMgrObj = new Configurator(toolsDir, tool, conf);
+                        // configObjs.push(MTBAppInfoParser.libMgrObj);
                     }
                 }
                 // console.log(configObjs);
@@ -348,15 +350,27 @@ class MTBAppInfoParser {
 
 export class MTBToolEntry extends BaseTreeNode {
     static displayNameProp = 'display_name';
+    static cmdLineArgsProp = 'command_line_args';
     static exeNameProp = 'executable';
-    static cmdLineArgs = 'command_line_args';
 
-    constructor(protected obj: Configurator, public readonly fsPath: string, parent?: BaseTreeNode) {
+    public fsPath: string = '';
+    protected children: MTBToolEntry[] = [];
+
+    constructor(
+        protected obj: Configurator | null,
+        public readonly uri: vscode.Uri | null,
+        protected parent?: BaseTreeNode) {
         super(parent);
+        this.fsPath = uri?.fsPath || '';
+    }
+
+    public addChild(child: MTBToolEntry): void {
+        this.children.push(child);
+        child.parent = this;
     }
 
     private getProp(nm: string, raw: boolean = false): string | any[] | null {
-        if (nm in this.obj.data) {
+        if (this.obj && (nm in this.obj.data)) {
             const ret = this.obj.data[nm];
             if (raw) { return ret; }
             return ret[0];
@@ -365,8 +379,12 @@ export class MTBToolEntry extends BaseTreeNode {
     }
 
     public displayName(): string {
-        const ret = this.getProp(MTBToolEntry.displayNameProp);
-        return (typeof(ret) === 'string') ? ret : '??';
+        if (this.isLeaf()) {
+            const ret = this.getProp(MTBToolEntry.displayNameProp);
+            return (typeof(ret) === 'string') ? ret : '??';
+        } else {
+            return path.basename(this.fsPath);
+        }
     }
 
     public exeName(): string {
@@ -376,7 +394,7 @@ export class MTBToolEntry extends BaseTreeNode {
     }
 
     public cmdLineArgs(): string[] {
-        const args = this.getProp(MTBToolEntry.cmdLineArgs, true) || [];
+        const args = this.getProp(MTBToolEntry.cmdLineArgsProp, true) || [];
         const ret: string[] = [];
         for (const arg of args) {
             if (typeof(arg) === 'string') {
@@ -386,37 +404,51 @@ export class MTBToolEntry extends BaseTreeNode {
         return ret;
     }
 
-    public getTreeItem(): vscode.TreeItem | Promise<vscode.TreeItem> {
-        const item = new vscode.TreeItem(this.displayName(), vscode.TreeItemCollapsibleState.None);
-        if (this.obj.id !== '') {
+    public getTreeItem() : vscode.TreeItem | Promise<vscode.TreeItem> {
+        const state = (this.isLeaf() ? vscode.TreeItemCollapsibleState.None :
+             vscode.TreeItemCollapsibleState.Expanded);
+        const item = new vscode.TreeItem(this.displayName(), state);
+        if (this.isLeaf() && this.obj && (this.obj.id !== '')) {
 			item.command = { command: 'mtbTools.openTool', title: `Open ${this.displayName}`, arguments: [this], };
 			item.contextValue = 'tool';
             // item.iconPath = this.obj.iconFile;
+            const img = (this.obj.id === 'bt-configurator') ?
+                '/Users/hdm/cypress/vscode/modustoolbox/resources/blah.svg' : this.obj.iconFile;
+            // const img = "/Users/hdm/Page 1.svg";
+            item.iconPath = {light: img, dark:img};
+        } else {
+            item.tooltip = this.fsPath;
         }
         return item;
     }
 
     public getChildren(): MTBToolEntry[] | Promise<MTBToolEntry[]> {
-        return [];
+        return this.children;
+    }
+    
+    public isLeaf() {
+        return this.children.length === 0;
     }
 
     private execToolWithCmd(cmd:string) {
-        console.log(`Running: ${cmd}`);
-        childProcess.exec(cmd, {cwd: this.fsPath}, (error) => {
-            if (error) {
-                console.log(error.message);
-                vscode.window.showErrorMessage(error.message);
-            }
-        });
+        if (this.isLeaf()) {
+            console.log(`Running: ${cmd}`);
+            childProcess.exec(cmd, {cwd: this.fsPath}, (error) => {
+                if (error) {
+                    console.log(error.message);
+                    vscode.window.showErrorMessage(error.message);
+                }
+            });
+        }
     }
 
     public execTool(): void {
-        let id = this.obj.id;
-        if (id === '') { return; }
+        let id = this.obj?.id || null;
+        if (!this.obj || !id) { return; }
 
         const make = ModusToolboxExtension.makeProgram;
         const extensions = this.obj.extensions;
-        if (id === MTBAppInfoParser.libraryManager) {
+        if (id === MTBAppInfoParser.libMgrId) {
             this.execToolWithCmd(`"${make}" modlibs`);
         } else if (true || !extensions || (extensions.length === 0)) {
             this.execToolWithCmd(`"${make}" open "CY_OPEN_TYPE=${id}"`);
@@ -459,29 +491,16 @@ export class MTBToolsProvider implements vscode.TreeDataProvider<MTBToolEntry> {
 	private _onDidChangeTreeData: vscode.EventEmitter<MTBToolEntry | undefined | void> = new vscode.EventEmitter<MTBToolEntry | undefined | void>();
 	readonly onDidChangeTreeData: vscode.Event<MTBToolEntry | undefined | void> = this._onDidChangeTreeData.event;
 
-    // onDidChangeTreeData?: vscode.Event<void | MTBToolEntry | null | undefined> | undefined;
     protected toolsDict : { [path: string]: MTBToolEntry[] } = {};
     protected allTools : MTBToolEntry[] = [];
     protected updatingFolders : MTBToolEntry[] = [];
     protected ownerView: vscode.TreeView<MTBToolEntry> | null = null;
-    protected curWsFolder: string = '';
     constructor() {
         this.getWorkspaceTools();
     }
 
     public setOwner(obj: vscode.TreeView<MTBToolEntry>) {
         this.ownerView = obj;
-    }
-
-    public setCurrentProj(fsPath: string) {
-        const tools = this.toolsDict[fsPath];
-        if (tools && (this.curWsFolder !== fsPath) && this.ownerView) {
-            this.curWsFolder = fsPath;
-            this.allTools = tools;
-            const basename = path.basename(fsPath);
-            this.ownerView.title = `MTB Tools(${basename})`;
-            this._onDidChangeTreeData.fire();
-        }
     }
 
     /**
@@ -492,23 +511,27 @@ export class MTBToolsProvider implements vscode.TreeDataProvider<MTBToolEntry> {
      */
     private getWorkspaceTools() {
         this.toolsDict = {};
-        this.allTools = [];
         this.updatingFolders = [];
-        this.curWsFolder = '';
+        this.allTools = [];
+        MTBAppInfoParser.libMgrObj = null;
         for (const folder of (vscode.workspace.workspaceFolders || [])) {
             const fsPath: string = folder.uri.fsPath;
-            if (!fsPath) { continue; }
-
             const mtbStuff = path.join(fsPath, '.mtbLaunchConfigs');
+            const curEntry = new MTBToolEntry(null, folder.uri);
             if (fs.existsSync(mtbStuff)) {
                 const msg = `Updating ${path.basename(fsPath)} ...`;
                 this.updatingFolders.push(MTBToolsProvider.createDummyNode(msg));
                 this._onDidChangeTreeData.fire();
-                this.getToolsForPath(fsPath).then((tools) => {
+                this.getToolsForPath(folder.uri).then((tools) => {
                     if (tools && (tools.length !== 0)) {
+                        if ((this.allTools.length === 0) && MTBAppInfoParser.libMgrObj) {
+                            this.allTools.push(
+                                new MTBToolEntry(MTBAppInfoParser.libMgrObj, folder.uri));
+                        }
                         this.toolsDict[fsPath] = tools;
-                        if (this.allTools.length === 0) {
-                            this.setCurrentProj(fsPath);
+                        this.allTools.push(curEntry);
+                        for (const tool of tools) {
+                            curEntry.addChild(tool);
                         }
                     }
                 }).finally(() => {
@@ -545,20 +568,20 @@ export class MTBToolsProvider implements vscode.TreeDataProvider<MTBToolEntry> {
     private static createDummyNode(msg: string) {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         const raw = new Configurator('', '', { display_name: [msg] });
-        const dummy = new MTBToolEntry(raw, '');
+        const dummy = new MTBToolEntry(raw, null);
         return dummy;
     }
 
-    public getToolsForPath(fsPath: string): Promise<MTBToolEntry[] | null> {
+    public getToolsForPath(uri: vscode.Uri): Promise<MTBToolEntry[] | null> {
         return new Promise((resolve, reject) => {
-            MTBAppInfoParser.getConfigurators(fsPath).then((rawConfigs) => {
+            MTBAppInfoParser.getConfigurators(uri.fsPath).then((rawConfigs) => {
                 if (!rawConfigs || (rawConfigs.length === 0)) {
                     return resolve(null);
                 }
 
                 const ret: MTBToolEntry[] = [];
                 for (const obj of rawConfigs) {
-                    const entry = new MTBToolEntry(obj, fsPath);
+                    const entry = new MTBToolEntry(obj, uri);
                     ret.push(entry);
                 }
                 return resolve(ret);
@@ -580,10 +603,6 @@ export class MTBTools {
 
 		vscode.commands.registerCommand('mtbTools.openTool', (tool) => this.openResource(tool));
         vscode.commands.registerCommand('mtbTools.refresh', () => this.treeDataProvider.refresh());
-        vscode.commands.registerCommand('mtbTools.explorerSelection', (e) => this.changeSelection(e));
-        vscode.window.onDidChangeActiveTextEditor(e => {
-            this.changeSelection(e?.document.uri);
-        });
         vscode.workspace.onDidChangeWorkspaceFolders(e => {
             // We could be smart and act on what changed (added or removed). Let us brute force for now
             this.treeDataProvider.refresh();
@@ -598,13 +617,9 @@ export class MTBTools {
 		vscode.window.showInformationMessage(`Clicked on ${tool.displayName()}!`);
         tool.execTool();
 	}
-
-    private changeSelection(e:any) {
-        if (e && e.fsPath) {
-            const wsFloder = vscode.workspace.getWorkspaceFolder(e);
-            if (wsFloder) {
-                this.treeDataProvider.setCurrentProj(wsFloder.uri.fsPath);
-            }
-        }
-    }
 }
+
+function getTreeItem() {
+    throw new Error('Function not implemented.');
+}
+
