@@ -142,6 +142,7 @@ class Configurator {
     static supportedxtensionsProp = 'supported_file_extensions';
     static supportedxtensionProp = 'supported_file_extension';
     static iconFileProp = 'icon';
+    static idProp = 'id';
 
     public displayName: string;
     public needsConfigFile;
@@ -154,6 +155,7 @@ class Configurator {
         public readonly id: string,
         public readonly data: any)
     {
+        this.id = XMLNodeHelpers.getElementAttr(data, Configurator.idProp) || this.id;
         this.displayName = XMLNodeHelpers.getElementStr(data, Configurator.displayNameProp) || '?huh?';
         this.needsConfigFile = XMLNodeHelpers.getElementStr(data, Configurator.newConfigEnabledProp).toLocaleLowerCase() === 'true';
 
@@ -182,7 +184,6 @@ class Configurator {
 
 class MTBAppInfoParser {
     public static readonly libMgrId: string  = 'library-manager';
-    public static libMgrObj : Configurator | null;
     public static getProperties(fsPath: string): Promise<SectionNodes | null> {
         return new Promise((resolve, reject) => {
             try {
@@ -287,7 +288,7 @@ class MTBAppInfoParser {
                             });
                         } catch (e) {
                         }
-                    } else if (!MTBAppInfoParser.libMgrObj && (tool === MTBAppInfoParser.libMgrId)) {
+                    } else if (tool === MTBAppInfoParser.libMgrId) {
                         // Fake an object
                         const v = version ? version : '';          
                         const conf = {
@@ -299,8 +300,7 @@ class MTBAppInfoParser {
                             // command_line_args: ['--config=$CONFIG_FILE'],
                             version: [ version || '' ]
                         };
-                        MTBAppInfoParser.libMgrObj = new Configurator(toolsDir, tool, conf);
-                        // configObjs.push(MTBAppInfoParser.libMgrObj);
+                        configObjs.push(new Configurator(toolsDir, tool, conf));
                     }
                 }
                 // console.log(configObjs);
@@ -412,10 +412,9 @@ export class MTBToolEntry extends BaseTreeNode {
 			item.command = { command: 'mtbTools.openTool', title: `Open ${this.displayName}`, arguments: [this], };
 			item.contextValue = 'tool';
             // item.iconPath = this.obj.iconFile;
-            const img = (this.obj.id === 'bt-configurator') ?
-                '/Users/hdm/cypress/vscode/modustoolbox/resources/blah.svg' : this.obj.iconFile;
-            // const img = "/Users/hdm/Page 1.svg";
-            item.iconPath = {light: img, dark:img};
+            const mySvg = path.join('/Users/hdm/cypress/vscode/modustoolbox/resources', this.obj.id + ".svg");
+            console.log([this.obj.id, mySvg]);
+            item.iconPath = fs.existsSync(mySvg) ? mySvg : this.obj.iconFile;
         } else {
             item.tooltip = this.fsPath;
         }
@@ -513,7 +512,6 @@ export class MTBToolsProvider implements vscode.TreeDataProvider<MTBToolEntry> {
         this.toolsDict = {};
         this.updatingFolders = [];
         this.allTools = [];
-        MTBAppInfoParser.libMgrObj = null;
         for (const folder of (vscode.workspace.workspaceFolders || [])) {
             const fsPath: string = folder.uri.fsPath;
             const mtbStuff = path.join(fsPath, '.mtbLaunchConfigs');
@@ -524,10 +522,6 @@ export class MTBToolsProvider implements vscode.TreeDataProvider<MTBToolEntry> {
                 this._onDidChangeTreeData.fire();
                 this.getToolsForPath(folder.uri).then((tools) => {
                     if (tools && (tools.length !== 0)) {
-                        if ((this.allTools.length === 0) && MTBAppInfoParser.libMgrObj) {
-                            this.allTools.push(
-                                new MTBToolEntry(MTBAppInfoParser.libMgrObj, folder.uri));
-                        }
                         this.toolsDict[fsPath] = tools;
                         this.allTools.push(curEntry);
                         for (const tool of tools) {
