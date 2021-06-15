@@ -25,7 +25,7 @@
 						"string"
 					],
 					"default": "",
-					"description": "Full path to the ModusToolbox tools"
+					"description": "Full path to the ModusToolbox tools directory"
 				}
 			}
 		},
@@ -46,7 +46,8 @@
 		"commands": [
 			{
 				"command": "mtbTools.openTool",
-				"title": "Open"
+				"title": "Open",
+				"icon": "$(tools)"
 			},
 			{
 				"command": "mtbTools.refresh",
@@ -55,7 +56,8 @@
 			},
 			{
 				"command": "mtbDocs.openDoc",
-				"title": "Open"
+				"title": "Open",
+				"icon": "$(link-external)"
 			},
 			{
 				"command": "mtbDocs.refresh",

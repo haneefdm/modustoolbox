@@ -18,6 +18,17 @@ export class ModusToolboxExtension {
 		this.activate();
 	}
 
+	public static tildify(path: string): string {
+		const platform = os.platform();
+		if (platform !== 'win32') {
+			const home = process.env.HOME;
+			if (home && path.startsWith(home)) {
+				path = '~' + path.substr(home.length);
+			}
+		}
+		return path;
+	}
+
 	private static getDefaultToolsDir(context: vscode.ExtensionContext): string {
 		if (ModusToolboxExtension.defaulToolsDir !== '') {
 			return ModusToolboxExtension.defaulToolsDir;

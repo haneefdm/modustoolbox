@@ -1,8 +1,8 @@
 import * as childProcess from 'child_process';
 import * as vscode from 'vscode';
-import * as path from 'path';
 import * as fs from 'fs';
 import { BaseTreeNode } from './base_tree_node';
+import { ModusToolboxExtension } from './extension';
 export class MTBDocEntry extends BaseTreeNode {
     protected children: MTBDocEntry[] = [];
 
@@ -18,11 +18,15 @@ export class MTBDocEntry extends BaseTreeNode {
              vscode.TreeItemCollapsibleState.Expanded);
         const item = new vscode.TreeItem(this.title, state);
         if (this.uri && this.isLeaf()) {
-			item.command = { command: 'mtbDocs.openDoc', title: `Open ${this.uri.path}`, arguments: [this], };
+            const shortPath = ModusToolboxExtension.tildify(this.uri.path);
+            const title = `Open '${shortPath}'`;
+            item.command = { command: 'mtbDocs.openDoc', title: title, arguments: [this], };
 			item.contextValue = 'doc';
-            item.tooltip = this.uri.toString(true);
+            item.tooltip = title;
+            item.iconPath = new vscode.ThemeIcon('file');
         } else if (this.uri) {
-			item.contextValue = 'folder';
+            item.iconPath = new vscode.ThemeIcon('file-directory');
+            item.contextValue = 'folder';
             item.tooltip = this.uri.fsPath;            
         }
         return item;
@@ -37,10 +41,37 @@ export class MTBDocEntry extends BaseTreeNode {
         child.parent = this;
     }
 
+    public openURL(fsPath: string) {
+        let opener;
+
+        switch (process.platform) {
+            case 'darwin':
+                opener = 'open';
+                break;
+            case 'win32':
+                // opener = 'start ""';  // Apparently a bug in VSCode encoding in urls needs an empty string
+                opener = 'start';
+                break;
+            default:
+                opener = 'xdg-open';
+                break;
+        }
+
+        fsPath = fsPath.replace(/"/g, '\\\"');
+        const cmd = `${opener} "${fsPath}"`;
+        childProcess.exec(cmd, (error) => {
+            if (error) {
+                console.log(error.message);
+                vscode.window.showErrorMessage(error.message);
+            }
+        });
+    }
+
     public openDoc(): void {
         if (this.uri && this.isLeaf()) {
             try {
-                vscode.env.openExternal(this.uri);
+                // vscode.env.openExternal(this.uri);  // broken in VSCode 1.57
+                this.openURL(this.uri.fsPath);
             } catch {
                 vscode.window.showErrorMessage(`Could not open ${this.uri.toString(true)}`);
             }
@@ -85,29 +116,29 @@ export class MTBDocsProvider implements vscode.TreeDataProvider<MTBDocEntry> {
         }
         vscode.workspace.findFiles("**/index.html").then((uris: vscode.Uri[]) => {
             this.allDocs = [];
+            // The returned values is unpredictable and seems almost random
+            uris.sort((a: vscode.Uri, b: vscode.Uri) => a.fsPath === b.fsPath ? 0 : (a.fsPath < b.fsPath ? -1 : 1));
             for (const uri of uris) {
                 try {
-                    if (uri.fsPath && fs.existsSync(uri.fsPath)) {
-                        const contents = fs.readFileSync(uri.fsPath, 'utf-8');
-                        const match = titleRexp.exec(contents);
-                        if (match) {
-                            const relPath = vscode.workspace.asRelativePath(uri, false);
-                            // Make sure file belongs to a ws-folder
-                            if (relPath && (relPath !== uri.fsPath)) {
-                                const folder = uri.fsPath.slice(0, -(relPath.length+1));
-                                const ix = wsFolders.findIndex((e) => e.uri?.fsPath === folder);
-                                if (ix >= 0) {
-                                    const title = match[1];
-                                    wsFolders[ix].addChild(new MTBDocEntry(title, uri, wsFolders[ix]));
-                                    // this.allDocs.push(new MTBDocEntry(title, uri));
-                                }
+                    const contents = fs.readFileSync(uri.fsPath, 'utf-8');
+                    const match = titleRexp.exec(contents);
+                    if (match) {
+                        const relPath = vscode.workspace.asRelativePath(uri, false);
+                        // Make sure file belongs to a ws-folder
+                        if (relPath && (relPath !== uri.fsPath)) {
+                            const folder = uri.fsPath.slice(0, -(relPath.length+1));
+                            const ix = wsFolders.findIndex((e) => e.uri?.fsPath === folder);
+                            if (ix >= 0) {
+                                const title = match[1];
+                                wsFolders[ix].addChild(new MTBDocEntry(title, uri, wsFolders[ix]));
                             }
-                        } else {
-                            console.log(contents);
                         }
+                    } else {
+                        // console.log(contents);
                     }
                 } catch (e) {
                     console.log(e);
+                    vscode.window.showErrorMessage(e.message);
                 }
             }
             this.allDocs = wsFolders.filter((e) => e.getChildren().length !== 0);

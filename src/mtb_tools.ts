@@ -409,13 +409,15 @@ export class MTBToolEntry extends BaseTreeNode {
              vscode.TreeItemCollapsibleState.Expanded);
         const item = new vscode.TreeItem(this.displayName(), state);
         if (this.isLeaf() && this.obj && (this.obj.id !== '')) {
-			item.command = { command: 'mtbTools.openTool', title: `Open ${this.displayName}`, arguments: [this], };
+			item.command = {command: 'mtbTools.openTool', title: `Open ${this.displayName()}`, arguments: [this]};
 			item.contextValue = 'tool';
+            item.tooltip = `Open '${this.displayName()}'`;
             // item.iconPath = this.obj.iconFile;
             const mySvg = path.join('/Users/hdm/cypress/vscode/modustoolbox/resources', this.obj.id + ".svg");
             console.log([this.obj.id, mySvg]);
             item.iconPath = fs.existsSync(mySvg) ? mySvg : this.obj.iconFile;
         } else {
+            item.iconPath = new vscode.ThemeIcon('circuit-board');
             item.tooltip = this.fsPath;
         }
         return item;
@@ -612,8 +614,3 @@ export class MTBTools {
         tool.execTool();
 	}
 }
-
-function getTreeItem() {
-    throw new Error('Function not implemented.');
-}
-
