@@ -34,12 +34,12 @@
 				{
 					"id": "mtbTools",
 					"name": "MTB Tools",
-					"visibility": "hidden"
+					"visibility": "visible"
 				},
 				{
 					"id": "mtbDocs",
 					"name": "MTB Docs",
-					"visibility": "hidden"
+					"visibility": "visible"
 				}
 			]
 		},
