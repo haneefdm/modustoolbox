@@ -11,6 +11,7 @@ const globSync = require('glob').sync;
 export class ModusToolboxExtension {
 	public static makeProgram = '';
 	public static defaulToolsDir: string = '';
+	public static extensionPath: string = '';
 
 	constructor(private context: vscode.ExtensionContext) {
 		ModusToolboxExtension.getDefaultToolsDir(this.context);
@@ -69,6 +70,7 @@ export class ModusToolboxExtension {
 	}
 
 	private activate() {
+		ModusToolboxExtension.extensionPath = this.context.extensionPath;
 		if (!ModusToolboxExtension.getMakeProgram(this.context)) {
 			const winExtra = (os.platform() === 'win32') ? '\nYou can use tool included with your ModusToolbox installation' : '';
 			vscode.window.showErrorMessage(`Extension 'modustoolbox' needs 'make' to be in your PATH to work${winExtra}`);
