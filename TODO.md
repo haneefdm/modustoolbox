@@ -3,7 +3,7 @@
 
 1. Licensing
 
-   I have never worked on closed source VSCOde extensions. Publishing requires registration with Microsoft. While I do pubilsh Cortex-Debug, I did not register it with the market place. Marcel gave me permission to publish. See https://code.visualstudio.com/api/working-with-extensions/publishing-extension
+   I have never worked on closed source VSCode extensions. Publishing requires registration with Microsoft. While I do pubilsh Cortex-Debug releases, I did not register it with the market-place. Marcel gave me permission to publish. See https://code.visualstudio.com/api/working-with-extensions/publishing-extension
 
 2. Storage, maintenance and deployment, asset owner
 
@@ -11,7 +11,7 @@
 
 3. Linux Testing: vscode.env.openExternal(...) is broken since last week
    * How to open in an external browser. VSCode will want to edit the HTML file
-   * I am using xdg-open, is this available on all distros?
+   * I am using xdg-open, is this available on all distros? This may also open the HTML file for editing
 
 4. All Platforms Testing:
    * Launching of tools (may not find the install-dir)
