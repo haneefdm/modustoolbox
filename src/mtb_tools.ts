@@ -412,10 +412,8 @@ export class MTBToolEntry extends BaseTreeNode {
 			item.command = {command: 'mtbTools.openTool', title: `Open ${this.displayName()}`, arguments: [this]};
 			item.contextValue = 'tool';
             item.tooltip = `Open '${this.displayName()}'`;
-            const mySvg = path.join(ModusToolboxExtension.extensionPath, 'resources', this.obj.id + ".svg");
-            item.iconPath = fs.existsSync(mySvg) ? mySvg : this.obj.iconFile;
+            // item.iconPath = this.fsPath;
         } else {
-            item.iconPath = new vscode.ThemeIcon('circuit-board');
             item.tooltip = this.fsPath;
         }
         return item;

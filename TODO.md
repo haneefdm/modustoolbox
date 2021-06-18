@@ -25,3 +25,7 @@
     * Same is true of the panel called "NPM SCRIPTS". Once it appears, it is in every workspace.
 
 2. Sometimes, the panels disappear. They are there for the user to enable on the top-right. This happens periodically to the Cortex-Debug created Panels and we can't figure out how that happens.
+
+## Feedback
+
+

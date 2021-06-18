@@ -10,15 +10,13 @@
 		"Other"
 	],
 	"activationEvents": [
-		"workspaceContains:./.mtbLaunchConfigs",
-		"onView:mtbToolsX",
-		"onView:mtbDocsX"
+		"workspaceContains:**/*.mtb"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
 		"configuration": {
 			"type": "object",
-			"title": "modustoolbox Configuration",
+			"title": "ModusToolbox Configuration",
 			"properties": {
 				"modustoolbox.toolsPath": {
 					"type": [
@@ -33,13 +31,13 @@
 			"explorer": [
 				{
 					"id": "mtbTools",
-					"name": "MTB Tools",
-					"visibility": "visible"
+					"name": "ModusToolbox Tools",
+					"visibility": "collapsed"
 				},
 				{
 					"id": "mtbDocs",
-					"name": "MTB Docs",
-					"visibility": "visible"
+					"name": "ModusToolbox Documents",
+					"visibility": "collapsed"
 				}
 			]
 		},
