@@ -20,7 +20,7 @@ export class MTBDocEntry extends BaseTreeNode {
         if (this.uri && this.isLeaf()) {
             const shortPath = ModusToolboxExtension.tildify(this.uri.path);
             const title = `Open '${shortPath}'`;
-            item.command = { command: 'mtbDocs.openDoc', title: title, arguments: [this], };
+            item.command = { command: 'modustoolbox.mtbDocs.openDoc', title: title, arguments: [this], };
 			item.contextValue = 'doc';
             item.tooltip = title;
             item.iconPath = new vscode.ThemeIcon('file');
@@ -166,18 +166,19 @@ export class MTBDocsProvider implements vscode.TreeDataProvider<MTBDocEntry> {
 }
 export class MTBDocs {
 	constructor(context: vscode.ExtensionContext) {
-        const treeDataProvider = new MTBDocsProvider();
-        context.subscriptions.push(vscode.window.createTreeView('mtbDocs', { treeDataProvider }));
-		vscode.commands.registerCommand('mtbDocs.openDoc', (doc) => this.openResource(doc));
-        vscode.commands.registerCommand('mtbDocs.refresh', () => treeDataProvider.refresh());
-        vscode.workspace.onDidChangeWorkspaceFolders(e => {
-            treeDataProvider.refresh();
-        });
-    }
+        function addDisp(item: vscode.Disposable) {
+            context.subscriptions.push(item);
+            return item;
+        }
 
-	private openResource(doc: MTBDocEntry): void {
-		vscode.window.showInformationMessage(`Clicked on ${doc.title}!`);
-        doc.openDoc();
-	}
+        const treeDataProvider = new MTBDocsProvider();
+        addDisp(vscode.window.createTreeView('modustoolbox.mtbDocs', { treeDataProvider }));
+		addDisp(vscode.commands.registerCommand('modustoolbox.mtbDocs.openDoc', (doc) => doc.openDoc()));
+        addDisp(vscode.commands.registerCommand('modustoolbox.mtbDocs.refresh', () => treeDataProvider.refresh()));
+        addDisp(vscode.workspace.onDidChangeWorkspaceFolders(e => {
+            // We could be smart and act on what changed (added or removed). Let us brute force for now
+            treeDataProvider.refresh();
+        }));
+    }
 }
 

@@ -409,7 +409,7 @@ export class MTBToolEntry extends BaseTreeNode {
              vscode.TreeItemCollapsibleState.Expanded);
         const item = new vscode.TreeItem(this.displayName(), state);
         if (this.isLeaf() && this.obj && (this.obj.id !== '')) {
-			item.command = {command: 'mtbTools.openTool', title: `Open ${this.displayName()}`, arguments: [this]};
+			item.command = {command: 'modustoolbox.mtbTools.openTool', title: `Open ${this.displayName()}`, arguments: [this]};
 			item.contextValue = 'tool';
             item.tooltip = `Open '${this.displayName()}'`;
             // item.iconPath = this.fsPath;
@@ -589,24 +589,20 @@ export class MTBTools {
     public treeView: vscode.TreeView<MTBToolEntry>;
     public treeDataProvider = new MTBToolsProvider();
 	constructor(context: vscode.ExtensionContext) {
-        this.treeView = vscode.window.createTreeView('mtbTools', { treeDataProvider: this.treeDataProvider });
-        context.subscriptions.push(this.treeView);
+        function addDisp(item: vscode.Disposable) {
+            context.subscriptions.push(item);
+            return item;
+        }
+
+        this.treeView = vscode.window.createTreeView('modustoolbox.mtbTools', { treeDataProvider: this.treeDataProvider });
+        addDisp(this.treeView);
         this.treeDataProvider.setOwner(this.treeView);
 
-		vscode.commands.registerCommand('mtbTools.openTool', (tool) => this.openResource(tool));
-        vscode.commands.registerCommand('mtbTools.refresh', () => this.treeDataProvider.refresh());
-        vscode.workspace.onDidChangeWorkspaceFolders(e => {
+		addDisp(vscode.commands.registerCommand('modustoolbox.mtbTools.openTool', (tool) => tool.execTool()));
+        addDisp(vscode.commands.registerCommand('modustoolbox.mtbTools.refresh', () => this.treeDataProvider.refresh()));
+        addDisp(vscode.workspace.onDidChangeWorkspaceFolders(e => {
             // We could be smart and act on what changed (added or removed). Let us brute force for now
             this.treeDataProvider.refresh();
-            // for (const added of e.added) {
-            //   const config = vscode.workspace.getConfiguration('tasks', e.added);
-            //   console.log(config);
-            // }
-        });
+        }));
     }
-
-	private openResource(tool: MTBToolEntry): void {
-		vscode.window.showInformationMessage(`Clicked on ${tool.displayName()}!`);
-        tool.execTool();
-	}
 }

@@ -72,28 +72,16 @@ export class ModusToolboxExtension {
 	private activate() {
 		ModusToolboxExtension.extensionPath = this.context.extensionPath;
 		if (!ModusToolboxExtension.getMakeProgram(this.context)) {
-			const winExtra = (os.platform() === 'win32') ? '\nYou can use tool included with your ModusToolbox installation' : '';
+			const winExtra = (os.platform() === 'win32') ? '\nYou can use tools included with your ModusToolbox installation' : '';
 			vscode.window.showErrorMessage(`Extension 'modustoolbox' needs 'make' to be in your PATH to work${winExtra}`);
 		} else {
-			// The command has been defined in the package.json file
-			// Now provide the implementation of the command with registerCommand
-			// The commandId parameter must match the command field in package.json
-			let disposable = vscode.commands.registerCommand('modustoolbox.helloWorld', () => {
-				// The code you place here will be executed every time your command is executed
-				// Display a message box to the user
-				vscode.window.showInformationMessage('Hello World from ModusToolbox!');
-			});
-	
-			this.context.subscriptions.push(disposable);
-	
 			new MTBTools.MTBTools(this.context);
 			new MTBDocs.MTBDocs(this.context);
 		}
-	}	
+	}
 }
 
 export function activate(context: vscode.ExtensionContext) {	
-	console.log('Congratulations, your extension "modustoolbox" is now active!');
 	new ModusToolboxExtension(context);
 }
 

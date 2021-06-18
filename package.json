@@ -30,12 +30,12 @@
 		"views": {
 			"explorer": [
 				{
-					"id": "mtbTools",
+					"id": "modustoolbox.mtbTools",
 					"name": "ModusToolbox Tools",
 					"visibility": "collapsed"
 				},
 				{
-					"id": "mtbDocs",
+					"id": "modustoolbox.mtbDocs",
 					"name": "ModusToolbox Documents",
 					"visibility": "collapsed"
 				}
@@ -43,48 +43,60 @@
 		},
 		"commands": [
 			{
-				"command": "mtbTools.openTool",
-				"title": "Open",
+				"command": "modustoolbox.mtbTools.openTool",
+				"title": "Open ModusToolbox Tool",
 				"icon": "$(tools)"
 			},
 			{
-				"command": "mtbTools.refresh",
-				"title": "Refresh",
+				"command": "modustoolbox.mtbTools.refresh",
+				"category": "ModusToolbox",
+				"title": "Refresh ModusToolbox Tools",
 				"icon": "$(refresh)"
 			},
 			{
-				"command": "mtbDocs.openDoc",
-				"title": "Open",
+				"command": "modustoolbox.mtbDocs.openDoc",
+				"title": "Open ModusToolbox Document",
 				"icon": "$(link-external)"
 			},
 			{
-				"command": "mtbDocs.refresh",
-				"title": "Refresh",
+				"command": "modustoolbox.mtbDocs.refresh",
+				"category": "ModusToolbox",
+				"title": "Refresh ModusToolbox Documents",
 				"icon": "$(refresh)"
 			}
 		],
 		"menus": {
+			"commandPalette": [
+				{
+					"command": "modustoolbox.mtbTools.openTool",
+					"when": "false"
+				},
+				{
+					"command": "modustoolbox.mtbDocs.openDoc",
+					"when": "false"
+				}
+			],
 			"view/title": [
 				{
-					"command": "mtbTools.refresh",
-					"when": "view == mtbTools",
+					"command": "modustoolbox.mtbTools.refresh",
+					"when": "view == modustoolbox.mtbTools",
 					"group": "navigation"
 				},
 				{
-					"command": "mtbDocs.refresh",
-					"when": "view == mtbDocs",
+					"command": "modustoolbox.mtbDocs.refresh",
+					"when": "view == modustoolbox.mtbDocs",
 					"group": "navigation"
 				}
 			],
 			"view/item/context": [
 				{
-					"command": "mtbTools.openTool",
-					"when": "view == mtbTools && viewItem == tool",
+					"command": "modustoolbox.mtbTools.openTool",
+					"when": "view == modustoolbox.mtbTools && viewItem == tool",
 					"group": "inline"
 				},
 				{
-					"command": "mtbDocs.openDoc",
-					"when": "view == mtbDocs && viewItem == doc",
+					"command": "modustoolbox.mtbDocs.openDoc",
+					"when": "view == modustoolbox.mtbDocs && viewItem == doc",
 					"group": "inline"
 				}
 			]
