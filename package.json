@@ -16,7 +16,7 @@
 	"contributes": {
 		"configuration": {
 			"type": "object",
-			"title": "ModusToolbox Configuration",
+			"title": "ModusToolbox",
 			"properties": {
 				"modustoolbox.toolsPath": {
 					"type": [
