@@ -2,7 +2,12 @@
 	"name": "modustoolbox",
 	"displayName": "ModusToolbox",
 	"description": "Design/Debug/Configure Infineon MCUs",
+    "publisher": "haneefdm",
 	"version": "0.0.1",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/haneefdm/modustoolbox.git"
+    },
 	"engines": {
 		"vscode": "^1.56.0"
 	},
